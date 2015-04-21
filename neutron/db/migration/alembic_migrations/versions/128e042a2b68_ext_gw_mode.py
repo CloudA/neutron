@@ -59,9 +59,13 @@ def upgrade(active_plugins=None, options=None):
         return
 
     op.add_column('routers', sa.Column('enable_snat', sa.Boolean(),
-                                       nullable=False, default=True))
+                                       nullable=True, default=True))
     # Set enable_snat to True for existing routers
     op.execute("UPDATE routers SET enable_snat=True")
+
+    #Fix for bug https://bugs.launchpad.net/neutron/+bug/1241577
+    op.alter_column('routers', 'enable_snat', nullable=False,
+                    existing_type=sa.Boolean())
 
 
 def downgrade(active_plugins=None, options=None):
